@@ -5,7 +5,8 @@ import json
 import base64
 
 # --- ⚠️ CONFIGURATION ⚠️ ---
-api_key = "AIzaSyBpx3zSff2FDmku2UKNbNil5rZ0q5hHe9E"  # Put your Gemini Key here
+api_key = st.secrets.get("GEMINI_API_KEY", None)
+
 background_image_file = r"C:\Users\SANKU\Downloads\WhatsApp Image 2026-01-10 at 19.29.38.jpeg"  # PUT YOUR LOCAL IMAGE FILE NAME HERE
 
 # --- PAGE CONFIGURATION ---
@@ -301,4 +302,5 @@ if st.button("🚀 RUN FEASIBILITY CHECK", type="primary"):
                     <div class="pillar-title">⚖️ Liability & Precedent Oracle</div>
                     <p>{novelty.get('legal_oracle', 'Checking case law...')}</p>
                 </div>
+
                 """, unsafe_allow_html=True)
