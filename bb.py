@@ -271,7 +271,7 @@ if st.button("🚀 RUN FEASIBILITY CHECK", type="primary"):
                 st.markdown('</div>', unsafe_allow_html=True)
 
             # --- SECTION 2: THE NOVELTY PILLARS (With Risk Scores) ---
-            st.markdown("### 🧠 The Core Reasoning Engines (Our Novelty)")
+            st.markdown("### 🧠 The Core Reasoning Engines")
             
             # Helper to safely extract text and score
             def get_pillar_data(key, default_text):
@@ -337,3 +337,4 @@ if st.button("🚀 RUN FEASIBILITY CHECK", type="primary"):
                     <div class="pillar-risk-score">⚠️ Risk Indicator: {legal_score}%</div>
                 </div>
                 """, unsafe_allow_html=True)
+
