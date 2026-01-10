@@ -7,7 +7,7 @@ import base64
 # --- ⚠️ CONFIGURATION ⚠️ ---
 api_key = st.secrets.get("GEMINI_API_KEY", None)
 
-background_image_file = r"C:\Users\SANKU\Downloads\WhatsApp Image 2026-01-10 at 19.29.38.jpeg"  # PUT YOUR LOCAL IMAGE FILE NAME HERE
+background_image_file = "background.jpeg"  # PUT YOUR LOCAL IMAGE FILE NAME HERE
 
 # --- PAGE CONFIGURATION ---
 st.set_page_config(
@@ -304,3 +304,4 @@ if st.button("🚀 RUN FEASIBILITY CHECK", type="primary"):
                 </div>
 
                 """, unsafe_allow_html=True)
+
