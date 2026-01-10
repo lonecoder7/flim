@@ -9,7 +9,6 @@ api_key = st.secrets.get("GEMINI_API_KEY", None)
 
 background_image_file = "background.jpeg"  # PUT YOUR LOCAL IMAGE FILE NAME HERE
 
-# --- PAGE CONFIGURATION ---
 st.set_page_config(
     page_title="ScriptSentinel AI",
     page_icon="🎬",
@@ -29,19 +28,18 @@ def get_base64_of_bin_file(bin_file):
 # Get Base64 string
 img_base64 = get_base64_of_bin_file(background_image_file)
 
-# Build the CSS string based on whether image was found
+# Build the CSS string
 if img_base64:
     css_background = f"""
     .stApp {{
         background-image: linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.9)), 
-                          url("data:image/png;base64,{img_base64}");
+                          url("data:image/jpeg;base64,{img_base64}");
         background-size: cover;
         background-position: center;
         background-attachment: fixed;
     }}
     """
 else:
-    # Fallback if image not found
     css_background = """
     .stApp {
         background: radial-gradient(circle at top center, #1b2735 0%, #090a0f 100%);
@@ -53,7 +51,7 @@ st.markdown(f"""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
     
-    /* 1. BACKGROUND IMAGE INJECTION */
+    /* 1. BACKGROUND IMAGE */
     {css_background}
     
     html, body, [class*="css"] {{
@@ -82,6 +80,9 @@ st.markdown(f"""
         padding: 20px;
         height: 100%;
         transition: transform 0.2s;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
     }}
     
     .pillar-card:hover {{
@@ -99,14 +100,17 @@ st.markdown(f"""
         letter-spacing: 0.5px;
     }}
     
-    .pillar-highlight {{
-        color: #64FFDA; 
-        font-weight: bold;
-        font-size: 0.9rem;
-        margin-top: 10px;
+    /* The New Red Risk Score at bottom of card */
+    .pillar-risk-score {{
+        color: #FF5252; /* Bright Red */
+        font-weight: 900;
+        font-size: 1.2rem;
+        text-align: right;
+        margin-top: 15px;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        padding-top: 10px;
     }}
     
-    /* Risk Badges */
     .risk-badge {{
         padding: 6px 12px;
         border-radius: 6px;
@@ -138,7 +142,6 @@ st.markdown(f"""
         vertical-align: middle;
     }}
     
-    /* Input Area Styling */
     .stTextArea textarea {{
         background-color: rgba(0, 0, 0, 0.5) !important;
         border: 1px solid rgba(255, 255, 255, 0.2) !important;
@@ -150,7 +153,8 @@ st.markdown(f"""
 
 # --- SIDEBAR ---
 with st.sidebar:
-    st.image("https://cdn-icons-png.flaticon.com/512/3074/3074767.png", width=60)
+    # 🎬 REPLACED IMAGE WITH EMOJI ICON 🎬
+    st.markdown("<div style='font-size: 80px; text-align: center;'>🎬</div>", unsafe_allow_html=True)
     st.title("ScriptSentinel")
     st.caption("The AI Line Producer")
     st.divider()
@@ -158,7 +162,8 @@ with st.sidebar:
     st.subheader("📍 Production Context")
     location = st.selectbox(
         "Shooting Location",
-        ["Kerala, India (Tropical)", 
+        ["Kerala, India (Tropical)",
+         "Hyderabad, India (Semi-Arid/Studio Hub)", 
          "Kashmir, India (Snow/Mountain)",
          "London, UK (Urban/Strict)",
          "Los Angeles, USA (Union)"]
@@ -168,7 +173,7 @@ with st.sidebar:
 
 # --- MAIN HEADER ---
 st.title("🎬 ScriptSentinel: AI Production Risk Analyzer")
-st.markdown("##### *The only AI that predicts Costs, Physics, and Lawsuits.*")
+st.markdown("##### *The AI that helps you with Film production, Feasibility and Risk*")
 
 # --- INPUT AREA ---
 script_input = st.text_area(
@@ -203,19 +208,17 @@ def analyze_script(script, loc):
     
     LANGUAGE INSTRUCTION: 
     1. Detect the language of the INPUT SCRIPT (e.g., Hindi, Malayalam, English).
-    2. The values for "intro", "mitigation_plan", and "novelty_analysis" MUST BE IN THE DETECTED LANGUAGE.
-    3. The keys (e.g., "risk_levels") MUST REMAIN IN ENGLISH.
+    2. The "intro", "mitigation_plan", and "analysis" text MUST BE IN THE DETECTED LANGUAGE.
+    3. The keys and structure MUST REMAIN IN ENGLISH.
     
     REQUIREMENTS:
     1. "detected_language": Name of the language detected.
-    2. "intro": 1 sentence summary (In Detected Language).
+    2. "intro": 1 sentence summary.
     3. "risk_levels": A dictionary with exact keys ["Weather", "Crowd", "NightShoot", "Stunt", "VFX"] and values "Low", "Medium", "High", or "Critical".
-    4. "mitigation_plan": A professional paragraph explaining the solution (In Detected Language).
-    5. "novelty_analysis": A dictionary for the 4 pillars (Values in Detected Language):
-       - "context_aware": specifically mention combinatorial risks.
-       - "locale_adaptive": specifically mention location logistics.
-       - "reality_check": specifically mention physics/time limits.
-       - "legal_oracle": specifically mention laws/precedents.
+    4. "mitigation_plan": A professional paragraph explaining the solution.
+    5. "novelty_analysis": A dictionary where each key (context_aware, locale_adaptive, reality_check, legal_oracle) maps to an OBJECT containing:
+         - "text": The analysis string.
+         - "score": A float number (0.0 to 99.9) representing the Risk Percentage.
 
     Output JSON ONLY. No markdown blocks.
     """
@@ -244,7 +247,6 @@ if st.button("🚀 RUN FEASIBILITY CHECK", type="primary"):
             st.markdown("### 📊 Scene Feasibility Report")
             
             with st.container():
-                
                 # Title with Detected Language Tag
                 lang = data.get('detected_language', 'English')
                 st.markdown(f"**SCENE SUMMARY** <span class='lang-tag'>{lang}</span>", unsafe_allow_html=True)
@@ -268,40 +270,70 @@ if st.button("🚀 RUN FEASIBILITY CHECK", type="primary"):
                 st.write(data.get("mitigation_plan"))
                 st.markdown('</div>', unsafe_allow_html=True)
 
-            # --- SECTION 2: THE NOVELTY PILLARS ---
+            # --- SECTION 2: THE NOVELTY PILLARS (With Risk Scores) ---
             st.markdown("### 🧠 The Core Reasoning Engines (Our Novelty)")
-            novelty = data.get("novelty_analysis", {})
             
+            # Helper to safely extract text and score
+            def get_pillar_data(key, default_text):
+                item = data.get("novelty_analysis", {}).get(key, {})
+                # Handle cases where AI might return just a string instead of object
+                if isinstance(item, str):
+                    return item, 50.0
+                return item.get("text", default_text), item.get("score", 0.0)
+
+            # Extract Data
+            loc_text, loc_score = get_pillar_data('locale_adaptive', 'Analyzing location...')
+            ctx_text, ctx_score = get_pillar_data('context_aware', 'Checking combinations...')
+            real_text, real_score = get_pillar_data('reality_check', 'Checking physics...')
+            legal_text, legal_score = get_pillar_data('legal_oracle', 'Checking laws...')
+
             row1 = st.columns(2)
             row2 = st.columns(2)
             
+            # CARD 1: Locale-Adaptive
             with row1[0]:
                 st.markdown(f"""
                 <div class="pillar-card">
-                    <div class="pillar-title">🌍 Locale-Adaptive Engine</div>
-                    <p>{novelty.get('locale_adaptive', 'Analyzing location logistics...')}</p>
+                    <div>
+                        <div class="pillar-title">🌍 Locale-Adaptive Engine</div>
+                        <p>{loc_text}</p>
+                    </div>
+                    <div class="pillar-risk-score">⚠️ Risk Indicator: {loc_score}%</div>
                 </div>
                 """, unsafe_allow_html=True)
+
+            # CARD 2: Context-Aware
             with row1[1]:
                 st.markdown(f"""
                 <div class="pillar-card">
-                    <div class="pillar-title">🛡️ Context-Aware Engine</div>
-                    <p>{novelty.get('context_aware', 'Checking combinatorial risks...')}</p>
+                    <div>
+                        <div class="pillar-title">🛡️ Context-Aware Engine</div>
+                        <p>{ctx_text}</p>
+                    </div>
+                    <div class="pillar-risk-score">⚠️ Risk Indicator: {ctx_score}%</div>
                 </div>
                 """, unsafe_allow_html=True)
+
+            # CARD 3: Reality Check
             with row2[0]:
                 st.markdown(f"""
                 <div class="pillar-card">
-                    <div class="pillar-title">⏳ Time & Physics Validator</div>
-                    <p>{novelty.get('reality_check', 'Calculating physics limits...')}</p>
+                    <div>
+                        <div class="pillar-title">⏳ Time & Physics Validator</div>
+                        <p>{real_text}</p>
+                    </div>
+                    <div class="pillar-risk-score">⚠️ Risk Indicator: {real_score}%</div>
                 </div>
                 """, unsafe_allow_html=True)
+
+            # CARD 4: Legal Oracle
             with row2[1]:
                 st.markdown(f"""
                 <div class="pillar-card">
-                    <div class="pillar-title">⚖️ Liability & Precedent Oracle</div>
-                    <p>{novelty.get('legal_oracle', 'Checking case law...')}</p>
+                    <div>
+                        <div class="pillar-title">⚖️ Liability & Precedent Oracle</div>
+                        <p>{legal_text}</p>
+                    </div>
+                    <div class="pillar-risk-score">⚠️ Risk Indicator: {legal_score}%</div>
                 </div>
-
                 """, unsafe_allow_html=True)
-
