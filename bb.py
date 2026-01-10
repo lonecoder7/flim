@@ -338,3 +338,4 @@ if st.button("🚀 RUN FEASIBILITY CHECK", type="primary"):
                 </div>
                 """, unsafe_allow_html=True)
 
+
