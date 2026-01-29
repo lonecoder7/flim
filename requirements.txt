@@ -1,9 +1,2 @@
 streamlit
 google-generativeai
-transformers
-torch  # Required by transformers
-gTTS
-numpy
-scipy
-Pillow
-python-dotenv
